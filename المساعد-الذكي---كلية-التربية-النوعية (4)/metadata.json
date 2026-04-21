@@ -1,0 +1,7 @@
+{
+  "name": "المساعد الذكي - كلية التربية النوعية",
+  "description": "مساعد صوتي ذكي لطلاب وزوار كلية التربية النوعية بجامعة كفر الشيخ، مدعوم بتقنية Gemini Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
