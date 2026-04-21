@@ -1,0 +1,101 @@
+{
+  "entities": {
+    "Media": {
+      "title": "Media Content",
+      "description": "Images and videos for the assistant to display.",
+      "type": "object",
+      "properties": {
+        "queryKey": {
+          "type": "string",
+          "description": "The keyword or phrase to match (e.g., 'تكنولوجيا التعليم')."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["image", "video"],
+          "description": "The type of media (image or video)."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL of the media file."
+        },
+        "title": {
+          "type": "string",
+          "description": "A descriptive title for the media."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional detailed description."
+        }
+      },
+      "required": ["queryKey", "type", "url", "title"]
+    },
+    "CollegeInfo": {
+      "title": "College Information",
+      "description": "Structured information about the college.",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "The category (e.g., 'أقسام', 'شؤون طلاب')."
+        },
+        "content": {
+          "type": "string",
+          "description": "The detailed text content."
+        },
+        "chunkIndex": {
+          "type": "integer",
+          "description": "The index of the chunk (0-based)."
+        },
+        "totalChunks": {
+          "type": "integer",
+          "description": "The total number of chunks for this category."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this info was last updated."
+        }
+      },
+      "required": ["category", "content"]
+    },
+    "QuestionCache": {
+      "title": "Question Cache",
+      "description": "Stored questions and their answers for quick retrieval.",
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string",
+          "description": "The user's question."
+        },
+        "answer": {
+          "type": "string",
+          "description": "The provided answer."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "count": {
+          "type": "integer",
+          "description": "How many times this question was asked."
+        }
+      },
+      "required": ["question", "answer"]
+    }
+  },
+  "firestore": {
+    "/media/{mediaId}": {
+      "schema": "Media",
+      "description": "Collection of media assets for the assistant."
+    },
+    "/college_info/{infoId}": {
+      "schema": "CollegeInfo",
+      "description": "Collection of structured college information."
+    },
+    "/questions_cache/{cacheId}": {
+      "schema": "QuestionCache",
+      "description": "Cache of previously answered questions."
+    }
+  }
+}
