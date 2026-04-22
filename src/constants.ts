@@ -90,4 +90,4 @@ export const SAVE_QUESTION_ANSWER_TOOL = {
   },
 };
 
-export const MODEL_NAME = "gemini-3.1-flash-live-preview";
+export const MODEL_NAME = "gemini-2.5-flash-native-audio-preview-09-2025";
