@@ -75,49 +75,119 @@ declare global {
 // يمكنك وضع مفتاح Gemini API الخاص بك هنا مباشرة
 const HARDCODED_API_KEY = ""; 
 
-const LOGO_URL = "https://i.imgur.com/your-logo-id.png"; // سيقوم المستخدم باستبدال هذا برابط الصورة المرفوعة
+const LOGO_URL = "https://i.top4top.io/p_3757qb3cg0.png"; // سيقوم المستخدم باستبدال هذا برابط الصورة المرفوعة
+import { motion, AnimatePresence } from 'framer-motion';
 
 const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
+  // الكلمات مرتبة لتظهر متسلسلة بدقة
+  const words = ["كلية", "التربية", "النوعية"];
+
+  // 1. حاوية النص - لإدارة الظهور المتسلسل
+  const textContainerVariants = {
+    initial: {},
+    animate: {
+      transition: { staggerChildren: 0.15, delayChildren: 1.2 } // تسلسل سريع ومضغوط
+    }
+  };
+
+  // 2. الكلمات الفردية - حركة ناعمة من الأسفل
+  const wordVariants = {
+    initial: { y: 25, opacity: 0 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } // انتقالات سلسة
+    }
+  };
+
+  // 3. حركة الخلفية المضيئة - تعميق المجال البصري
+  const backgroundVariants = {
+    initial: { opacity: 0, scale: 1 },
+    animate: {
+      opacity: [0.1, 0.25, 0.1],
+      scale: [1, 1.05, 1],
+      transition: { duration: 12, repeat: Infinity, ease: "easeInOut" }
+    }
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 1, delay: 3 }}
-      onAnimationComplete={onComplete}
-      className="fixed inset-0 z-[200] bg-[#0a0502] flex flex-col items-center justify-center p-6"
-    >
+    <AnimatePresence>
       <motion.div
-        initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
-        animate={{ scale: 1, opacity: 1, rotate: 0 }}
-        transition={{ 
-          duration: 1.5, 
-          ease: "easeOut",
-          type: "spring",
-          stiffness: 100
-        }}
-        className="relative"
+        key="splash"
+        initial={{ opacity: 1, filter: "blur(0px)" }}
+        animate={{ opacity: 0, filter: "blur(50px)" }}
+        transition={{ duration: 1.8, delay: 6, ease: [0.77, 0, 0.175, 1] }} // خروج سينمائي
+        onAnimationComplete={onComplete}
+        className="fixed inset-0 z-[200] bg-[#0c0603] flex flex-col items-center justify-center overflow-hidden"
+        dir="rtl"
       >
-        <div className="absolute inset-0 bg-orange-500/20 blur-3xl rounded-full animate-pulse" />
-        <img 
-          src={LOGO_URL} 
-          alt="Logo" 
-          className="w-48 h-48 object-contain relative z-10"
-          onError={(e) => {
-            // Fallback if logo fails to load
-            (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/2991/2991148.png";
-          }}
-        />
+        {/* أ) الخلفية المضيئة المحسنة - لعمق بصري */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            variants={backgroundVariants}
+            initial="initial"
+            animate="animate"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-orange-900/20 blur-[150px] rounded-full"
+          />
+        </div>
+
+        {/* ب) الشعار الرقمي المحسن */}
+        <motion.div
+          initial={{ scale: 0.7, opacity: 0, filter: "blur(10px)" }}
+          animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+          transition={{ duration: 1.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }} // ظهور "مُركز"
+          className="relative mb-14 p-10 rounded-[3rem] bg-white/[0.03] backdrop-blur-3xl border border-white/5 shadow-2xl"
+        >
+          {/* هالة داخلية دقيقة */}
+          <div className="absolute inset-0 bg-orange-600/10 blur-[50px] rounded-full scale-125animate-pulse" />
+          
+          <img
+            src={LOGO_URL}
+            alt="Logo"
+            className="relative z-10 w-48 h-48 md:w-60 md:h-60 object-contain drop-shadow-[0_0_15px_rgba(249,115,22,0.3)]"
+          />
+        </motion.div>
+
+        {/* ج) النصوص - ظهور "بوابة المعرفة" الرقمي */}
+        <div className="text-center z-10 w-full px-6">
+          <motion.div
+            className="flex flex-row justify-center items-end gap-3 md:gap-4 mb-4"
+            variants={textContainerVariants}
+            initial="initial"
+            animate="animate"
+          >
+            {words.map((word, index) => (
+              <motion.span
+                key={index}
+                variants={wordVariants}
+                className={`font-black text-white drop-shadow-sm ${word === "النوعية" ? "text-5xl md:text-7xl" : "text-4xl md:text-6xl"}`}
+              >
+                {word}
+              </motion.span>
+            ))}
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.8, duration: 1.2, ease: "easeOut" }}
+            className="text-orange-500 font-bold uppercase tracking-[0.35em] text-sm md:text-base border-t border-orange-500/30 pt-4"
+          >
+            جامعة كفر الشيخ
+          </motion.p>
+        </div>
+
+        {/* د) خط التحميل الرقمي السفلي - لعمق بصري */}
+        <div className="absolute bottom-0 left-0 right-0 h-[4px] bg-orange-950/20 w-full overflow-hidden">
+          <motion.div
+            className="absolute right-0 top-0 bottom-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-l-full shadow-[0_0_10px_rgba(249,115,22,0.6)]"
+            initial={{ width: 0 }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 7, ease: "easeInOut" }}
+          />
+        </div>
       </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 1 }}
-        className="mt-8 text-center"
-      >
-        <h1 className="text-3xl font-bold tracking-tight text-glow mb-2">كلية التربية النوعية</h1>
-        <p className="text-orange-500 font-bold uppercase tracking-[0.2em] text-xs">جامعة كفر الشيخ</p>
-      </motion.div>
-    </motion.div>
+    </AnimatePresence>
   );
 };
 
