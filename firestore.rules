@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerified() && 
+        (request.auth.token.email.lower() == "ibrahimalkhooly@gmail.com" || 
+         request.auth.uid == "BcB2OWFaJqTS2sxMAolO8OEAK1r1");
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // ===============================================================
+    // Validation Blueprints
+    // ===============================================================
+
+    function isValidMedia(data) {
+      return data.keys().hasAll(['queryKey', 'type', 'url', 'title']) &&
+             data.queryKey is string && data.queryKey.size() > 0 &&
+             data.type in ['image', 'video'] &&
+             data.url is string && data.url.matches("^https?://.*") &&
+             data.title is string && data.title.size() > 0;
+    }
+
+    function isValidInfo(data) {
+      return data.keys().hasAll(['category', 'content']) &&
+             data.category is string && data.category.size() > 0 &&
+             data.content is string && data.content.size() > 0;
+    }
+
+    function isValidCache(data) {
+      return data.keys().hasAll(['question', 'answer']) &&
+             data.keys().hasOnly(['question', 'answer', 'timestamp', 'lastAsked', 'count']) &&
+             data.question is string && data.question.size() > 0 && data.question.size() <= 1000 &&
+             data.answer is string && data.answer.size() > 0 && data.answer.size() <= 10000 &&
+             (!('timestamp' in data) || data.timestamp is timestamp) &&
+             (!('lastAsked' in data) || data.lastAsked is timestamp) &&
+             (!('count' in data) || data.count is number);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    match /media/{mediaId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidMedia(incoming());
+      allow update: if isAdmin() && isValidMedia(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /college_info/{infoId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidInfo(incoming());
+      allow update: if isAdmin() && isValidInfo(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /questions_cache/{cacheId} {
+      allow read: if true;
+      allow create: if isValidCache(incoming());
+      allow update: if isValidCache(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['count', 'lastAsked']);
+      allow delete: if isAdmin();
+    }
+  }
+}
